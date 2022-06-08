@@ -2,7 +2,6 @@
 !.env.sample
 node_modules/
 devMeta.json
-public/storage/*
 public/uploads/*
 config/.env*
 !config/.env.db_config.sample
