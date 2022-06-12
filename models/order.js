@@ -29,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     shipment: DataTypes.STRING,
     shipmentCost: DataTypes.DOUBLE.UNSIGNED,
     paymentMethod: DataTypes.STRING,
-    total: DataTypes.DOUBLE.UNSIGNED,
     status: DataTypes.STRING,
+    phone: DataTypes.STRING,
     createdBy: DataTypes.STRING,
     modifiedBy: DataTypes.STRING
   }, {

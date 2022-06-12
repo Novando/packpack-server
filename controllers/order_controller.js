@@ -1,11 +1,33 @@
-const order								= require('../models').order;
-const ipify								= require('ipify2');
+const order								        = require('../models').order;
+const orderDetail					        = require('../models').orderDetail;
+const ipify								        = require('ipify2');
+const { QueryTypes }   = require('sequelize');
+const sequelize = require('sequelize');
 
 // Show all orders
 exports.print = async (req, res) => {
   try{
     const result = await order.findAll();
-    res.status(200).json(result);
+    const allResult = await result.map(async (item) => {
+      const subTotal = await orderDetail.findAll({
+        attributes: [
+          [sequelize.fn('sum', sequelize.col('subtotal')), 'totalPrice']
+        ],
+        raw: true,
+        where: {
+          orderId: item.id
+        }
+      })
+      const theDetails = Object.assign(
+        item.dataValues,
+        {
+          totalPrice: subTotal[0].totalPrice || 0
+        }
+      )
+      return (theDetails)
+    })
+    const promise = await Promise.all(allResult)
+    res.status(200).json(promise)
   } catch(err) {
     res.status(400).send(err);
   }
@@ -19,10 +41,9 @@ exports.add = async(req, res, next) => {
     // START creating invoice number
 
     // Check total order on following month
-    const count = await order.query(
-      'SELECT COUNT(*) FROM orders WHERE MONTH(createdAt) = MONTH(CURRENT_DATE)'
+    const count = await order.sequelize.query(
+      'SELECT COUNT(*) FROM orders WHERE MONTH(createdAt) = MONTH(CURRENT_DATE)', { type: QueryTypes.SELECT}
     );
-
     const month = (new Date()).getMonth(); // range from 0 to 11
     const year = (new Date()).getFullYear();
 
@@ -69,9 +90,9 @@ exports.add = async(req, res, next) => {
         return res.sendStatus(500);
     }
 
-    const invoice = toString(count) + '/INV/CJG/' + romans + '/' + year;
+    const invoice = JSON.stringify(count[0]['COUNT(*)']) + '/INV/CJG/' + romans + '/' + year;
     // END creating invoice number
-
+    
     const ip = await ipify.ipv4();
 
     // START Insert into database
@@ -91,6 +112,7 @@ exports.add = async(req, res, next) => {
       paymentMethod : req.body.paymentMethod,
       shipment      : req.body.shipment,
       shipmentCost  : req.body.shipmentCost,
+      phone         : req.body.phone,
       status        : 'created',
       createdBy     : ip,
       modifiedBy    : ip

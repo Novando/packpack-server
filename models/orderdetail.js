@@ -16,12 +16,13 @@ module.exports = (sequelize, DataTypes) => {
   orderDetail.init({
     orderId: DataTypes.BIGINT.UNSIGNED,
     productId: DataTypes.BIGINT.UNSIGNED,
-    productCustomId: DataTypes.BIGINT.UNSIGNED,
+    productName: DataTypes.STRING,
     materialId: DataTypes.BIGINT.UNSIGNED,
-    discountId: DataTypes.BIGINT.UNSIGNED,
-    shipping: DataTypes.STRING,
+    materialName: DataTypes.STRING,
     length: DataTypes.INTEGER,
     width: DataTypes.INTEGER,
+    weight: DataTypes.DOUBLE.UNSIGNED,
+    qty: DataTypes.INTEGER,
     subtotal: DataTypes.DOUBLE.UNSIGNED,
     createdBy: DataTypes.STRING,
     modifiedBy: DataTypes.STRING

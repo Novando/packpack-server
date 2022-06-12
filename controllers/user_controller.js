@@ -49,8 +49,9 @@ exports.login = async(req, res) => {
 		let getId		 			= getUser.id;
 		let getRole 			= getUser.role;
 		let getUsername		= getUser.username;
+		let getEmail 			= getUser.email;
 		const accessToken = jwt.sign(
-													{getRole, getId, getUsername},
+													{getRole, getId, getUsername, getEmail},
 													process.env.SERVER_ACCESS_SECRET,
 													{ expiresIn: '1d' }
 												);

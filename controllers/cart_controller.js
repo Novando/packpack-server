@@ -36,31 +36,22 @@ exports.show = async (req, res) => {
 	console.log('mulai');
 	try{
 		const getCart = await cart.findAll({
-			attributes: {
-				exclude: [
-					'createdBy',
-					'modifiedBy',
-					'createdAt',
-					'updatedAt'
-				]
-			},
 			where:{
 				userId: req.body.userId
 			}
 		});
-		console.log('sampe sini');
 		if (!getCart){
-			return res.status(200).send({ msg: 'Cart empty' });
+			return res.status(200).json({data: [], msg: 'Cart empty' });
 		};
 
 		// console.log(getCart[0]['id']);
-		let datum = 0;
 		let data = getCart.length;
-		let allProducts = [];
-		let getProduct
 		console.log(data);
-		while (datum < data) {
-			if (getCart[datum]['productId']) {
+		const allProducts = await getCart.map(async (item) => {
+			console.log('masuk')
+			let getProduct = null
+			let getMaterial = null
+			if (item.productId) {
 				getProduct = await product.findOne({
 					attributes: [
 						'shape',
@@ -69,10 +60,9 @@ exports.show = async (req, res) => {
 						'mainImg',
 					],
 					where:{
-						id: getCart[datum]['productId']
+						id: item.productId
 					}
-				});
-				console.log('productId');
+				})
 			} else {
 				getProduct = await productCustom.findOne({
 					attributes: [
@@ -83,11 +73,10 @@ exports.show = async (req, res) => {
 						'designFiles',
 					],
 					where:{
-						id: getCart[datum]['productCustomId']
+						id: item.productCustomId
 					}
-				});
+				})
 			}
-
 			getMaterial = await material.findOne({
 				attributes: [
 					'price',
@@ -95,23 +84,28 @@ exports.show = async (req, res) => {
 					'width'
 				],
 				where:{
-					id: getCart[datum]['materialId']
+					id: item.materialId
 				}
 			})
-
-			console.log(getProduct.dataValues);
+			
+			const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.price) || 0
+			const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.weight) || 0
+			
 			let theProduct = Object.assign(
 				{},
-				getCart[datum].dataValues,
+				item.dataValues,
 				getProduct.dataValues,
-				getMaterial.dataValues
-			);
-			allProducts.push(theProduct);
-			datum ++;
-			
-		}
-
-		res.json(allProducts)
+				getMaterial.dataValues,
+				{
+					subPrice: subPrice,
+					subWeight: subWeight
+				}
+			)
+			return (theProduct);
+		})
+		const promises = await Promise.all(allProducts)
+		console.log('theProduct')
+		res.status(200).json(promises)
 	} catch(err) {
 		console.log(err)
 	}

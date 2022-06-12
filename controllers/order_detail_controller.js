@@ -1,4 +1,5 @@
-const orderDetail					= require('../models').orderdetail;
+const orderDetail					= require('../models').orderDetail;
+const order					      = require('../models').order;
 const cart                = require('../models').cart;
 const material            = require('../models').material;
 const product             = require('../models').product;
@@ -21,8 +22,10 @@ exports.add = async(req, res) => {
     });
 
     while (counter < count) {
+      let getProduct = null
+      let productName = null
       if (rows[counter].productId) {
-        const getProduct = await product.findOne({
+        getProduct = await product.findOne({
           where:{
             id: rows[counter].productId
           }
@@ -31,10 +34,10 @@ exports.add = async(req, res) => {
         const variant = jsConvert.toHeaderCase(getProduct.variant);
         const shape   = jsConvert.toUpperCase(getProduct.shape);
 
-        const productName = name + ' - ' + variant + ' [' + shape + ']';
+        productName = name + ' - ' + variant + ' [' + shape + ']';
 
       } else if (rows[counter].productCustomId) {
-        const getProduct = await productCustom.findOne({
+        getProduct = await productCustom.findOne({
           where:{
             id: rows[counter].productCustomId
           }
@@ -47,14 +50,14 @@ exports.add = async(req, res) => {
 
         const firstName   = '(#' + user + ' - ' + brand + ') ';
         const lastName    = name + ' - ' + variant + ' [' + shape + ']';
-        const productName = firstName + lastName; 
+        productName = firstName + lastName; 
 
       } else {
         return res.status(400).send({ msg: "Product / product custom ID cannot be NULL" });
       };
 
       if (!getProduct) {
-        return res.status(400).send({ msg: "Product/ product custom ID didn't exist" });
+        return res.status(400).send({ msg: "Product / product custom ID didn't exist" });
       };
 
       const getMaterial = await material.findOne({
@@ -70,8 +73,8 @@ exports.add = async(req, res) => {
       const width   = rows[counter].width;
       const length  = rows[counter].length;
       const qty     = rows[counter].qty;
-      const weight  = width * length * qty * getMaterial.weight;
-      const subtotal= width * length * qty * getMaterial.price;
+      const weight  = length * qty * getMaterial.weight;
+      const subtotal= length * qty * getMaterial.price;
       
       const ip = await ipify.ipv4();
       await orderDetail.create({
@@ -89,6 +92,13 @@ exports.add = async(req, res) => {
         modifiedBy  : ip 
       });
 
+      await cart.destroy({
+        where: {
+          id: rows[counter].id
+        }
+      })
+
+      counter ++
     }
   } catch(err) {
     console.log(err)
