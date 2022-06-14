@@ -106,7 +106,7 @@ exports.showUser = async (req, res) => {
 					id: item.materialId
 				}
 			})
-			
+			await Promise.all(getMaterial);
 			const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.price) || 0
 			const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.weight) || 0
 			
