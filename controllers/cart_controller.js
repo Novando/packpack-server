@@ -108,8 +108,34 @@ exports.showUser = async (req, res) => {
 					}
 				})
 				// await Promise.all();
-				const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.price) || 0
-				const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.weight) || 0
+				const subPrice = async () => {
+					return (
+						parseFloat(item.length) * parseFloat(item.qty) * parseFloat(
+							await material.findOne({
+								attributes: [
+									'price',
+								],
+								where:{
+									id: item.materialId
+								}
+							})
+						)
+					)
+				}
+				const subWeight = async () => {
+					return (
+						parseFloat(item.length) * parseFloat(item.qty) * parseFloat(
+							await material.findOne({
+								attributes: [
+									'weight',
+								],
+								where:{
+									id: item.materialId
+								}
+							})
+						)
+					)
+				}
 				
 				let theProduct = Object.assign(
 					{},
