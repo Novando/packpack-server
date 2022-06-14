@@ -107,8 +107,8 @@ exports.showUser = async (req, res) => {
 				}
 			})
 			// await Promise.all();
-			const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(await getMaterial.price) || 0
-			const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(await getMaterial.weight) || 0
+			const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(await getMaterial({attributes: ['price'], where:{id:item.materialId}})) || 0
+			const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(await getMaterial({attributes: ['weight'], where:{id:item.materialId}})) || 0
 			
 			let theProduct = Object.assign(
 				{},
