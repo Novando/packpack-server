@@ -7,7 +7,9 @@ const cart  						= require('../controllers/cart_controller.js');
 const cartRoute			= express.Router();
 
 // User management
-cartRoute.post('/show/user', cart.show);
+cartRoute.get('/', cart.show);
+cartRoute.post('/show/user', cart.showUser);
 cartRoute.post('/add', cart.add);
+userRoute.delete('/remove/:id', cart.remove);
 
 module.exports = cartRoute;

@@ -8,6 +8,25 @@ const path 								= require('path');
 const ipify								= require('ipify2');
 const { Op } 							= require('sequelize');
 
+
+exports.show = async (req,res) => {
+	try{
+		let result = await cart.findAll();
+    res.json(result);
+  } catch(err) {
+    res.json(err);
+  };
+}
+
+exports.remove = async(req, res) => {
+	await cart.destroy({
+		where:{
+			id: req.params.id,
+		}
+	});;
+	return res.sendStatus(200);
+};
+
 exports.add = async (req, res) => {
 	try{
 		let userId = req.body.userId;
@@ -32,7 +51,7 @@ exports.add = async (req, res) => {
 	}
 }
 
-exports.show = async (req, res) => {
+exports.showUser = async (req, res) => {
 	console.log('mulai');
 	try{
 		const getCart = await cart.findAll({

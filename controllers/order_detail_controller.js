@@ -92,14 +92,15 @@ exports.add = async(req, res) => {
         modifiedBy  : ip 
       });
 
-      await cart.destroy({
-        where: {
-          id: rows[counter].id
-        }
-      })
-
+      
       counter ++
     }
+    await cart.destroy({
+      where: {
+        userId: req.body.userId
+      }
+    })
+    res.status(200).send({msg: "order created"})
   } catch(err) {
     console.log(err)
   }
