@@ -123,11 +123,13 @@ exports.showUser = async (req, res) => {
 			return (theProduct);
 		})
 		const promises = await Promise.all(allProducts)
-		let resObj = {}
+		let resObj = []
 		promises.forEach(item => {
-			resObj = item
-			resObj.subWeight = item.weight * item.length * item.qty
-			resObj.subPrice = item.price * item.length * item.qty
+			let itemObj = {}
+			itemObj = item
+			itemObj.subWeight = item.weight * item.length * item.qty
+			itemObj.subPrice = item.price * item.length * item.qty
+			resObj.push(itemObj)
 		})
 		
 		console.log('theProduct')
