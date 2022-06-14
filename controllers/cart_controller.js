@@ -67,94 +67,71 @@ exports.showUser = async (req, res) => {
 		let data = getCart.length;
 		console.log(data);
 		const allProducts = await getCart.map(async (item) => {
-			try{
-				console.log('masuk')
-				let getProduct = null
-				let getMaterial = null
-				if (item.productId) {
-					getProduct = await product.findOne({
-						attributes: [
-							'shape',
-							'name',
-							'variant',
-							'mainImg',
-						],
-						where:{
-							id: item.productId
-						}
-					})
-				} else {
-					getProduct = await productCustom.findOne({
-						attributes: [
-							'shape',
-							'brandName',
-							'productName',
-							'variantName',
-							'designFiles',
-						],
-						where:{
-							id: item.productCustomId
-						}
-					})
-				}
-				getMaterial = await material.findOne({
+			console.log('masuk')
+			let getProduct = null
+			let getMaterial = null
+			if (item.productId) {
+				getProduct = await product.findOne({
 					attributes: [
-						'price',
-						'weight',
-						'width'
+						'shape',
+						'name',
+						'variant',
+						'mainImg',
 					],
 					where:{
-						id: item.materialId
+						id: item.productId
 					}
 				})
-				// await Promise.all();
-				const subPrice = async () => {
-					return (
-						parseFloat(item.length) * parseFloat(item.qty) * parseFloat(
-							await material.findOne({
-								attributes: [
-									'price',
-								],
-								where:{
-									id: item.materialId
-								}
-							})
-						)
-					)
-				}
-				const subWeight = async () => {
-					return (
-						parseFloat(item.length) * parseFloat(item.qty) * parseFloat(
-							await material.findOne({
-								attributes: [
-									'weight',
-								],
-								where:{
-									id: item.materialId
-								}
-							})
-						)
-					)
-				}
-				
-				let theProduct = Object.assign(
-					{},
-					item.dataValues,
-					getProduct.dataValues,
-					getMaterial.dataValues,
-					{
-						subPrice: subPrice,
-						subWeight: subWeight
+			} else {
+				getProduct = await productCustom.findOne({
+					attributes: [
+						'shape',
+						'brandName',
+						'productName',
+						'variantName',
+						'designFiles',
+					],
+					where:{
+						id: item.productCustomId
 					}
-				)
-				return (theProduct);
-			} catch (err) {
-				console.log(err)
+				})
 			}
+			getMaterial = await material.findOne({
+				attributes: [
+					'price',
+					'weight',
+					'width'
+				],
+				where:{
+					id: item.materialId
+				}
+			})
+			// await Promise.all();
+			const subPrice = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.price) || 0
+			const subWeight = parseFloat(item.length) * parseFloat(item.qty) * parseFloat(getMaterial.weight) || 0
+			
+			let theProduct = Object.assign(
+				{},
+				item.dataValues,
+				getProduct.dataValues,
+				getMaterial.dataValues,
+				{
+					subPrice: subPrice,
+					subWeight: subWeight
+				}
+			)
+			return (theProduct);
 		})
 		const promises = await Promise.all(allProducts)
+		let resObj = {}
+		promises.forEach(item => {
+			resObj = item
+			resObj.subWeight = item.weight * item.length * item.qty
+			resObj.subPrice = item.price * item.length * item.qty
+		})
+		
 		console.log('theProduct')
-		res.status(200).json(promises)
+		res.status(200).json(resObj)
 	} catch(err) {
 		console.log(err)
 	}
