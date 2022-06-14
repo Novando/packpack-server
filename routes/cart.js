@@ -10,6 +10,6 @@ const cartRoute			= express.Router();
 cartRoute.get('/', cart.show);
 cartRoute.post('/show/user', cart.showUser);
 cartRoute.post('/add', cart.add);
-userRoute.delete('/remove/:id', cart.remove);
+cartRoute.delete('/remove/:id', cart.remove);
 
 module.exports = cartRoute;
