@@ -147,7 +147,6 @@ exports.add = async(req, res, next) => {
     });
     // END Insert into database
     
-    res.status(200).send({ msg: 'Order created' });
     next();
   } catch(err) {
     console.log(err);
