@@ -61,6 +61,20 @@ exports.detail = async (req, res) => {
   }
 }
 
+exports.confirm = async (req, res) => {
+  try{
+    await order.update({
+      status: 'confirmed'
+    }, {
+      where: {
+        id: req.params.id
+      }
+    })
+  } catch(err) {
+    res.status(400).send(err);
+  }
+}
+
 // Add new order
 exports.add = async(req, res, next) => {
   try{
