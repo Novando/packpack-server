@@ -9,6 +9,7 @@ const orderRoute			= express.Router();
 
 // Order management
 orderRoute.get('/', order.print);
+orderRoute.get('/:id', order.detail);
 orderRoute.post('/add', order.add, orderDetail.add);
 
 module.exports = orderRoute;

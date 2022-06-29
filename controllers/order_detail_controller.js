@@ -100,7 +100,7 @@ exports.add = async(req, res) => {
         userId: req.body.userId
       }
     })
-    res.status(200).send({msg: "order created"})
+    res.status(200).send({msg: "order created", orderId: getOrder.id})
   } catch(err) {
     console.log(err)
   }
