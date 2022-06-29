@@ -40,25 +40,22 @@ exports.detail = async (req, res) => {
         id: req.params.id
       }
     })
-    const allResult = await result.map(async (item) => {
-      const subTotal = await orderDetail.findAll({
-        attributes: [
-          [sequelize.fn('sum', sequelize.col('subtotal')), 'totalPrice']
-        ],
-        raw: true,
-        where: {
-          orderId: item.id
-        }
-      })
-      const theDetails = Object.assign(
-        item.dataValues,
-        {
-          totalPrice: subTotal[0].totalPrice || 0
-        }
-      )
-      return (theDetails)
+    const subTotal = await orderDetail.findAll({
+      attributes: [
+        [sequelize.fn('sum', sequelize.col('subtotal')), 'totalPrice']
+      ],
+      raw: true,
+      where: {
+        orderId: result.id
+      }
     })
-    const promise = await Promise.all(allResult)
+    const theDetails = Object.assign(
+      result.dataValues,
+      {
+        totalPrice: subTotal[0].totalPrice || 0
+      }
+    )
+    const promise = await Promise.all(theDetails)
     res.status(200).json(promise)
   } catch(err) {
     res.status(400).send(err);
