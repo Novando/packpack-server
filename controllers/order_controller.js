@@ -55,8 +55,7 @@ exports.detail = async (req, res) => {
         totalPrice: subTotal[0].totalPrice || 0
       }
     )
-    const promise = await Promise.all(theDetails)
-    res.status(200).json(promise)
+    res.status(200).json(theDetails)
   } catch(err) {
     res.status(400).send(err);
   }
