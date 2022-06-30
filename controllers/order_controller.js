@@ -37,7 +37,7 @@ exports.printUser = async (req, res) => {
   try{
     const result = await order.findAll({
       where: {
-        username: req.body.username
+        username: req.params.username
       }
     });
     const allResult = await result.map(async (item) => {
