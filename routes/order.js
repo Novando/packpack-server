@@ -10,7 +10,7 @@ const orderRoute			= express.Router();
 // Order management
 orderRoute.get('/', order.print);
 orderRoute.get('/user/:username', order.printUser);
-orderRoute.get('/:id', order.detail);
+orderRoute.get('/detail/:id', order.detail);
 orderRoute.put('/confirm/:id', order.confirm);
 orderRoute.post('/add', order.add, orderDetail.add);
 
